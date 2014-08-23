@@ -7,6 +7,15 @@ import (
 	"testing"
 )
 
+func testMethodOK(t *testing.T, recorder *httptest.ResponseRecorder) {
+	if recorder.Code != http.StatusOK {
+		t.Errorf("expeect HTTP 200 status code but was %d", recorder.Code)
+	}
+	if recorder.Body.String() != "Hello GET Method" {
+		t.Errorf("expect \"Hello GET Method\" but was \"%s\"", recorder.Body.String())
+	}
+}
+
 func Test_GET_Method_OK(t *testing.T) {
 	var handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello GET Method")
@@ -17,33 +26,34 @@ func Test_GET_Method_OK(t *testing.T) {
 
 	handler.ServeHTTP(res, req)
 
-	if res.Code != http.StatusOK {
-		t.Errorf("expeect HTTP 200 status code but was %d", res.Code)
+	testMethodOK(t, res)
+}
+
+func testMethodNotAllowed(t *testing.T, recorder *httptest.ResponseRecorder) {
+	if recorder.Code != http.StatusMethodNotAllowed {
+		t.Errorf("expeect HTTP 405 status code but was %d", recorder.Code)
 	}
-	if res.Body.String() != "Hello GET Method" {
-		t.Errorf("expect \"Hello GET Method\" but was \"%s\"", res.Body.String())
+
+	if recorder.Body.String() != "Method Not Allowed\n" {
+		t.Errorf("expeect \"Method Not Allowed\" but was \"%s\"", recorder.Body.String())
 	}
 }
 
 func Test_GET_Method_Not_Allow(t *testing.T) {
-	var methods = []string{"POST", "PUT", "DELETE", "HEAD"}
-
-	for _, m := range methods {
-		var handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
+	var (
+		methods = []string{"POST", "PUT", "DELETE", "HEAD"}
+		handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello GET Method")
 		})
+	)
 
+	for _, m := range methods {
 		req, _ := http.NewRequest(m, "/hello", nil)
 		res := httptest.NewRecorder()
 
 		handler.ServeHTTP(res, req)
 
-		if res.Code != http.StatusMethodNotAllowed {
-			t.Errorf("expeect HTTP 405 status code but was %d", res.Code)
-		}
-
-		if res.Body.String() != "Method Not Allowed\n" {
-			t.Errorf("expeect \"Method Not Allowed\" but was \"%s\"", res.Body.String())
-		}
+		testMethodNotAllowed(t, res)
 	}
 }
+
