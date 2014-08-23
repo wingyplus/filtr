@@ -2,22 +2,20 @@ package filtr
 
 import "net/http"
 
-func GET(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+func allowedMethod(method string, h http.Handler) http.Handler{
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
+		if r.Method != method {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		} else {
-			f(w, r)
+			h.ServeHTTP(w, r)
 		}
 	})
 }
 
+func GET(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return allowedMethod("GET", http.HandlerFunc(f))
+}
+
 func POST(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
-		}else {
-			f(w, r)
-		}
-	})
+	return allowedMethod("POST", http.HandlerFunc(f))
 }
