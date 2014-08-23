@@ -29,6 +29,7 @@ func TestMethodOK(t *testing.T) {
 	var testCases = []testCase{
 		testCase{"GET", GET(fn)},
 		testCase{"POST", POST(fn)},
+		testCase{"PUT", PUT(fn)},
 	}
 
 	for _, tc := range testCases {

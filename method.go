@@ -19,3 +19,7 @@ func GET(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 func POST(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return allowedMethod("POST", http.HandlerFunc(f))
 }
+
+func PUT(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return allowedMethod("PUT", http.HandlerFunc(f))
+}
