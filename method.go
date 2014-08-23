@@ -4,7 +4,7 @@ import "net/http"
 
 func GET(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" {
+		if r.Method != "GET" {
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 		} else {
 			f(w, r)

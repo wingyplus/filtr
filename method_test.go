@@ -26,20 +26,24 @@ func Test_GET_Method_OK(t *testing.T) {
 }
 
 func Test_GET_Method_Not_Allow(t *testing.T) {
-	var handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello GET Method")
-	})
+	var methods = []string{"POST", "PUT", "DELETE", "HEAD"}
 
-	req, _ := http.NewRequest("POST", "/hello", nil)
-	res := httptest.NewRecorder()
+	for _, m := range methods {
+		var handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "Hello GET Method")
+		})
 
-	handler.ServeHTTP(res, req)
+		req, _ := http.NewRequest(m, "/hello", nil)
+		res := httptest.NewRecorder()
 
-	if res.Code != http.StatusMethodNotAllowed {
-		t.Errorf("expeect HTTP 405 status code but was %d", res.Code)
-	}
+		handler.ServeHTTP(res, req)
 
-	if res.Body.String() != "Method Not Allowed\n" {
-		t.Errorf("expeect \"Method Not Allowed\" but was \"%s\"", res.Body.String())
+		if res.Code != http.StatusMethodNotAllowed {
+			t.Errorf("expeect HTTP 405 status code but was %d", res.Code)
+		}
+
+		if res.Body.String() != "Method Not Allowed\n" {
+			t.Errorf("expeect \"Method Not Allowed\" but was \"%s\"", res.Body.String())
+		}
 	}
 }
