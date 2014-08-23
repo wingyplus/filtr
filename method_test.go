@@ -70,3 +70,20 @@ func Test_POST_Method_OK(t *testing.T) {
 	testMethodOK(t, res)
 }
 
+func Test_POST_Method_Not_Allow(t *testing.T) {
+	var (
+		methods = []string{"GET", "PUT", "DELETE", "HEAD"}
+		handler http.Handler = POST(func(w http.ResponseWriter, r *http.Request) {
+			fmt.Fprintf(w, "Hello GET Method")
+		})
+	)
+
+	for _, m := range methods {
+		req, _ := http.NewRequest(m, "/hello", nil)
+		res := httptest.NewRecorder()
+
+		handler.ServeHTTP(res, req)
+
+		testMethodNotAllowed(t, res)
+	}
+}
