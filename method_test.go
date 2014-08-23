@@ -11,22 +11,34 @@ func testMethodOK(t *testing.T, recorder *httptest.ResponseRecorder) {
 	if recorder.Code != http.StatusOK {
 		t.Errorf("expeect HTTP 200 status code but was %d", recorder.Code)
 	}
-	if recorder.Body.String() != "Hello GET Method" {
-		t.Errorf("expect \"Hello GET Method\" but was \"%s\"", recorder.Body.String())
+	if recorder.Body.String() != "Hello Method" {
+		t.Errorf("expect \"Hello Method\" but was \"%s\"", recorder.Body.String())
 	}
 }
 
-func Test_GET_Method_OK(t *testing.T) {
-	var handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello GET Method")
-	})
+type testCase struct {
+	method string
+	h      http.Handler
+}
 
-	req, _ := http.NewRequest("GET", "/hello", nil)
-	res := httptest.NewRecorder()
+func fn(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello Method")
+}
 
-	handler.ServeHTTP(res, req)
+func TestMethodOK(t *testing.T) {
+	var testCases = []testCase{
+		testCase{"GET", GET(fn)},
+		testCase{"POST", POST(fn)},
+	}
 
-	testMethodOK(t, res)
+	for _, tc := range testCases {
+		req, _ := http.NewRequest(tc.method, "/hello", nil)
+		recorder := httptest.NewRecorder()
+
+		tc.h.ServeHTTP(recorder, req)
+
+		testMethodOK(t, recorder)
+	}
 }
 
 func testMethodNotAllowed(t *testing.T, recorder *httptest.ResponseRecorder) {
@@ -41,7 +53,7 @@ func testMethodNotAllowed(t *testing.T, recorder *httptest.ResponseRecorder) {
 
 func Test_GET_Method_Not_Allow(t *testing.T) {
 	var (
-		methods = []string{"POST", "PUT", "DELETE", "HEAD"}
+		methods              = []string{"POST", "PUT", "DELETE", "HEAD"}
 		handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello GET Method")
 		})
@@ -57,22 +69,9 @@ func Test_GET_Method_Not_Allow(t *testing.T) {
 	}
 }
 
-func Test_POST_Method_OK(t *testing.T) {
-	var handler http.Handler = POST(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Hello GET Method")
-	})
-
-	req, _ := http.NewRequest("POST", "/hello", nil)
-	res := httptest.NewRecorder()
-
-	handler.ServeHTTP(res, req)
-
-	testMethodOK(t, res)
-}
-
 func Test_POST_Method_Not_Allow(t *testing.T) {
 	var (
-		methods = []string{"GET", "PUT", "DELETE", "HEAD"}
+		methods              = []string{"GET", "PUT", "DELETE", "HEAD"}
 		handler http.Handler = POST(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello GET Method")
 		})
