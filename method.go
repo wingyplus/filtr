@@ -12,18 +12,18 @@ func allowedMethod(method string, h http.Handler) http.Handler {
 	})
 }
 
-func GET(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return allowedMethod("GET", http.HandlerFunc(f))
+func GET(h http.Handler) http.Handler {
+	return allowedMethod("GET", h)
 }
 
-func POST(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return allowedMethod("POST", http.HandlerFunc(f))
+func POST(h http.Handler) http.Handler {
+	return allowedMethod("POST", h)
 }
 
-func PUT(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return allowedMethod("PUT", http.HandlerFunc(f))
+func PUT(h http.Handler) http.Handler {
+	return allowedMethod("PUT", h)
 }
 
-func DELETE(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
-	return allowedMethod("DELETE", http.HandlerFunc(f))
+func DELETE(h http.Handler) http.Handler {
+	return allowedMethod("DELETE", h)
 }

@@ -25,12 +25,16 @@ func fn(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Hello Method")
 }
 
+func newHandler(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return http.HandlerFunc(f)
+}
+
 func TestMethodOK(t *testing.T) {
 	var testCases = []testCase{
-		testCase{"GET", GET(fn)},
-		testCase{"POST", POST(fn)},
-		testCase{"PUT", PUT(fn)},
-		testCase{"DELETE", DELETE(fn)},
+		testCase{"GET", GET(newHandler(fn))},
+		testCase{"POST", POST(newHandler(fn))},
+		testCase{"PUT", PUT(newHandler(fn))},
+		testCase{"DELETE", DELETE(newHandler(fn))},
 	}
 
 	for _, tc := range testCases {
@@ -56,9 +60,9 @@ func testMethodNotAllowed(t *testing.T, recorder *httptest.ResponseRecorder) {
 func Test_GET_Method_Not_Allow(t *testing.T) {
 	var (
 		methods              = []string{"POST", "PUT", "DELETE", "HEAD"}
-		handler http.Handler = GET(func(w http.ResponseWriter, r *http.Request) {
+		handler http.Handler = GET(newHandler(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello GET Method")
-		})
+		}))
 	)
 
 	for _, m := range methods {
@@ -74,9 +78,9 @@ func Test_GET_Method_Not_Allow(t *testing.T) {
 func Test_POST_Method_Not_Allow(t *testing.T) {
 	var (
 		methods              = []string{"GET", "PUT", "DELETE", "HEAD"}
-		handler http.Handler = POST(func(w http.ResponseWriter, r *http.Request) {
+		handler http.Handler = POST(newHandler(func(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "Hello GET Method")
-		})
+		}))
 	)
 
 	for _, m := range methods {
