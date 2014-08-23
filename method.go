@@ -23,3 +23,7 @@ func POST(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 func PUT(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
 	return allowedMethod("PUT", http.HandlerFunc(f))
 }
+
+func DELETE(f func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	return allowedMethod("DELETE", http.HandlerFunc(f))
+}
