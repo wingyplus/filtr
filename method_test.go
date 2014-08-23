@@ -57,3 +57,16 @@ func Test_GET_Method_Not_Allow(t *testing.T) {
 	}
 }
 
+func Test_POST_Method_OK(t *testing.T) {
+	var handler http.Handler = POST(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello GET Method")
+	})
+
+	req, _ := http.NewRequest("POST", "/hello", nil)
+	res := httptest.NewRecorder()
+
+	handler.ServeHTTP(res, req)
+
+	testMethodOK(t, res)
+}
+
